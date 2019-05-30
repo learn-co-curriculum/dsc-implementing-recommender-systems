@@ -194,7 +194,7 @@ print(accuracy.rmse(predictions))
     4.135960456406754
 
 
-A little better... let's try one more neighborhood based method before moving into more model-based methods. Let's try the [KNNBaseline](https://surprise.readthedocs.io/en/stable/knn_inspired.html#surprise.prediction_algorithms.knns.KNNBaseline) method. This is a more advanced method because it adds in a bias term that is calculated by way of minimizing a cost function represented by:
+A little better... let's try one more neighborhood-based method before moving into more model-based methods. Let's try the [KNNBaseline](https://surprise.readthedocs.io/en/stable/knn_inspired.html#surprise.prediction_algorithms.knns.KNNBaseline) method. This is a more advanced method because it adds in a bias term that is calculated by way of minimizing a cost function represented by:
 
 $$ \sum_{r_{ui} \in R_{\text{train}}}{(\hat{r}_{ui} - ( \mu + b_{i} + b_{u}))^{2} + \lambda(b_u^2 + b_i^2) } $$
 
