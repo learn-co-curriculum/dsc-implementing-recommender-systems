@@ -1,18 +1,17 @@
 
-# Implementing Recommendation Engines with Surprise
+# Implementing Recommendation Engines with `surprise`
 ## Introduction
 
-This lesson will give you a brief introduction to implementing recommendation engines with a python library called surprise. In this lesson, you'll get a chance to try out multiple different types of collaborative filtering engines, ranging from both basic neighborhood-based methods to matrix factorization methods.
+This lesson will give you a brief introduction to implementing recommendation engines with a Python library called `surprise`. You'll get a chance to try out multiple different types of collaborative filtering engines, ranging from both basic neighborhood-based methods to matrix factorization methods. 
 
 ## Objectives
 You will be able to:
 
-* Compare and evaluate different recommendation algorithms
-* Use surprise's built-in reader class to process data to work with recommender algorithms
-* Cross-validate recommender algorithms
-* Obtain predictions for a specific user at a specific point in time
+- Use `surprise`'s built-in reader class to process data to work with recommender algorithms 
+- Use `surprise` to create and cross-validate different recommender algorithms 
+- Obtain a prediction for a specific user for a particular item 
 
-In this lesson, we'll be working with a dataset built-in to surprise called the jester dataset. This dataset contains jokes rated by users on a scale of -10 to 10 based off a user's perceived humor level for a given joke. Let's get recommending some jokes!
+In this lesson, we'll be working with a dataset built-in to `surprise` called the `jester` dataset. This dataset contains jokes rated by users on a scale of -10 to 10 based off a user's perceived humor level for a given joke. Let's get recommending some jokes! 
 
 First, you'll have to load the jokes dataset. You might have to download it first if prompted. Let's investigate the dataset after we load that. In this folder, you'll find the file for the text of jokes if you want to investigate what caliber of human you're dealing with here.
 
@@ -37,11 +36,11 @@ type(jokes)
 
 
 ```python
-# split into train and test set.
-trainset, testset = train_test_split(jokes,test_size=0.2)
+# Split into train and test set
+trainset, testset = train_test_split(jokes, test_size=0.2)
 ```
 
-Notice how there is no X_train or y_train in our values here. Our only features here are the ratings of other users and items, so we need to keep everything together. What is happening in the train test split here is that surprise is randomly selecting certain $r_{ij}$ for users $u_{i}$ and items $i_{j} $ at the rate of 80% of the ratings in the train set and 20% in the test set. Let's investigate `trainset` and `testset` further.
+Notice how there is no `X_train` or `y_train` in our values here. Our only features here are the ratings of other users and items, so we need to keep everything together. What is happening in the train-test split here is that `surprise` is randomly selecting certain $r_{ij}$ for users $u_{i}$ and items $i_{j} $. 80% of the ratings are in the training set and 20% in the test set. Let's investigate `trainset` and `testset` further. 
 
 
 ```python
@@ -54,7 +53,7 @@ print('Type testset :',type(testset))
     Type testset : <class 'list'>
 
 
-Interestingly enough, the values here are different datatypes! The trainset is still a surprise specific datatype that is optimized for computational efficiency and the test set is a standard python list. You'll see why when we start making predictions. Let's take a look at how large our testset is as well as what's contained in an individual element. A sacrifice of surprise's implementation is that we lose a lot of the exploratory methods that are present with pandas.
+Interestingly enough, the values here are of different data types! The `trainset` is still a `surprise` specific data type that is optimized for computational efficiency and the `testset` is a standard Python list - you'll see why when we start making predictions. Let's take a look at how large our `testset` is as well as what's contained in an individual element. A sacrifice of `surprise`'s implementation is that we lose a lot of the exploratory methods that are present with Pandas.
 
 
 ```python
@@ -68,7 +67,7 @@ print(testset[0])
 
 ## Memory-Based Methods (Neighborhood-Based)
 
-To begin with, we can calculate the more simple neighborhood-based approaches. Some things to keep in mind are what type of similarities you should use. These can all have fairly substantial effects on the overall performance of the model. You'll notice that the API of surprise is very similar to sci-kit learn when it comes to model fitting and testing. To begin with, we'll import the modules we'll be using for the Neighborhood-Based methods.
+To begin with, we can calculate the more simple neighborhood-based approaches. Some things to keep in mind are what type of similarities you should use. These can all have fairly substantial effects on the overall performance of the model. You'll notice that the API of surprise is very similar to scikit-learn when it comes to model fitting and testing. To begin with, we'll import the modules we'll be using for the neighborhood-based methods.
 
 
 ```python
@@ -81,8 +80,8 @@ One of our first decisions is item-item similarity versus user-user similarity. 
 
 
 ```python
-print('Number of users: ',trainset.n_users,'\n')
-print('Number of items: ',trainset.n_items,'\n')
+print('Number of users: ', trainset.n_users, '\n')
+print('Number of items: ', trainset.n_items, '\n')
 
 ```
 
@@ -96,10 +95,10 @@ There are clearly way more users than items! We'll take that into account when i
 
 
 ```python
-sim_cos = {'name':'cosine','user_based':False}
+sim_cos = {'name':'cosine', 'user_based':False}
 ```
 
-Now it's time to train our model. Note that if you decide to train this model with user_based = True, it will take quite some time!
+Now it's time to train our model. Note that if you decide to train this model with `user_based=True`, it will take quite some time!
 
 
 ```python
@@ -164,7 +163,7 @@ Not a particularly amazing model.... As you can see, the model had an RMSE of ab
 
 
 ```python
-sim_pearson = {'name':'pearson','user_based':False}
+sim_pearson = {'name':'pearson', 'user_based':False}
 basic_pearson = knns.KNNBasic(sim_options=sim_pearson)
 basic_pearson.fit(trainset)
 predictions = basic_pearson.test(testset)
@@ -181,7 +180,7 @@ Pearson correlation seems to have performed better than cosine similarity in the
 
 
 ```python
-sim_pearson = {'name':'pearson','user_based':False}
+sim_pearson = {'name':'pearson', 'user_based':False}
 knn_means = knns.KNNWithMeans(sim_options=sim_pearson)
 knn_means.fit(trainset)
 predictions = knn_means.test(testset)
@@ -194,7 +193,7 @@ print(accuracy.rmse(predictions))
     4.135960456406754
 
 
-A little better... let's try one more neighborhood-based method before moving into more model-based methods. Let's try the [KNNBaseline](https://surprise.readthedocs.io/en/stable/knn_inspired.html#surprise.prediction_algorithms.knns.KNNBaseline) method. This is a more advanced method because it adds in a bias term that is calculated by way of minimizing a cost function represented by:
+A little better... let's try one more neighborhood-based method before moving into model-based methods. Let's try the [KNNBaseline](https://surprise.readthedocs.io/en/stable/knn_inspired.html#surprise.prediction_algorithms.knns.KNNBaseline) method. This is a more advanced method because it adds in a bias term that is calculated by way of minimizing a cost function represented by:
 
 $$ \sum_{r_{ui} \in R_{\text{train}}}{(\hat{r}_{ui} - ( \mu + b_{i} + b_{u}))^{2} + \lambda(b_u^2 + b_i^2) } $$
 
@@ -202,7 +201,7 @@ With $b_i$ and $b_u$ being biases for items and users respectively and $\mu$ ref
 
 
 ```python
-sim_pearson = {'name':'pearson','user_based':False}
+sim_pearson = {'name':'pearson', 'user_based':False}
 knn_baseline = knns.KNNBaseline(sim_options=sim_pearson)
 knn_baseline.fit(trainset)
 predictions = knn_baseline.test(testset)
@@ -220,9 +219,9 @@ Even better! Now let's see if we can get some insight by applying some matrix fa
 
 ## Model-Based Methods (Matrix Factorization)
 
-It's worth pointing out that when SVD is calculated for recommendation systems, it is preferred to be done with a modified version called "Funk's SVD" that only takes into account the rated values, ignoring whatever items have not been rated by users. The algorithm is named after Simon Funk, who was part of the team who placed 3rd in the Netflix challenge with this innovative way of performing matrix decomposition. Read more about Funk's SVD implementation at [his original blog post](https://sifter.org/~simon/journal/20061211.html). There is no simple way to include for this fact with scipy's implementation of svd, but luckily the surprise library has Funk's version of SVD implemented to make our lives easier!
+It's worth pointing out that when SVD is calculated for recommendation systems, it is preferred to be done with a modified version called "Funk's SVD" that only takes into account the rated values, ignoring whatever items have not been rated by users. The algorithm is named after Simon Funk, who was part of the team who placed 3rd in the Netflix challenge with this innovative way of performing matrix decomposition. Read more about Funk's SVD implementation at [his original blog post](https://sifter.org/~simon/journal/20061211.html). There is no simple way to include for this fact with SciPy's implementation of `svd()`, but luckily the `surprise` library has Funk's version of SVD implemented to make our lives easier!
 
-As with other sklearn libraries, we can expedite the process of trying out different parameters by using an implementation of GridSearch. Let's make use of the Gridsearch here to account for some different configurations of parameters within the SVD pipeline. This might take some time! You'll notice that the n_jobs parameter set to -1, which ensures that all of the cores on my computer will be used to process fitting and evaluating all of these models. To help keep track of what is occurring here, take note of the different values. This code ended up taking over 16 minutes to complete even with parallelization in effect, so the optimal parameters are given to you for the SVD model below. Use them to train a model and let's see how well it performs. If you want the full GridSearch experience, feel free to uncomment the code and give it a go!
+Similar to other `sklearn` features, we can expedite the process of trying out different parameters by using an implementation of grid search. Let's make use of the grid search here to account for some different configurations of parameters within the SVD pipeline. This might take some time! You'll notice that the `n_jobs` is parameter set to -1, which ensures that all of the cores on your computer will be used to process fitting and evaluating all of these models. To help keep track of what is occurring here, take note of the different values. This code ended up taking over 16 minutes to complete even with parallelization in effect, so the optimal parameters are given to you for the SVD model below. Use them to train a model and let's see how well it performs. If you want the full grid search experience, feel free to uncomment the code and give it a go!
 
 The optimal parameters are :
 
@@ -236,7 +235,7 @@ The optimal parameters are :
 from surprise.prediction_algorithms import SVD
 from surprise.model_selection import GridSearchCV
 
-# param_grid = {'n_factors':[20,100],'n_epochs': [5, 10], 'lr_all': [0.002, 0.005],
+# param_grid = {'n_factors':[20, 100],'n_epochs': [5, 10], 'lr_all': [0.002, 0.005],
 #               'reg_all': [0.4, 0.6]}
 # gs_model = GridSearchCV(SVD,param_grid=param_grid,n_jobs = -1,joblib_verbose=5)
 # gs_model.fit(jokes)
@@ -244,7 +243,7 @@ from surprise.model_selection import GridSearchCV
 
 
 ```python
-svd = SVD(n_factors=100,n_epochs=10,lr_all=0.005,reg_all=0.4)
+svd = SVD(n_factors=100, n_epochs=10, lr_all=0.005, reg_all=0.4)
 svd.fit(trainset)
 predictions = svd.test(testset)
 print(accuracy.rmse(predictions))
@@ -258,13 +257,11 @@ Interestingly, this model performed worse than the others! In general, the advan
 
 ## Making Predictions
 
-Now that we've explored some models, we can think about how we might fit the models into the context of an application. To begin with, let's access some basic functionality of surprise models to get predicted ratings for a given user and item. All that's needed are the user_id and item_id for which you want to make a prediction. Here we're making a prediction for user 34 and item 25 using the SVD model we just fit.
-
-
+Now that we've explored some models, we can think about how we might fit the models into the context of an application. To begin with, let's access some basic functionality of `surprise` models to get predicted ratings for a given user and item. All that's needed are the `user_id` and `item_id` for which you want to make a prediction. Here we're making a prediction for user 34 and item 25 using the SVD model we just fit. 
 
 
 ```python
-user_34_prediction = svd.predict('34','25')
+user_34_prediction = svd.predict('34', '25')
 user_34_prediction
 ```
 
@@ -289,7 +286,7 @@ user_34_prediction[3]
 
 
 
-You might be wondering, "OK I'm making predictions about certain items rated by certain users, but how can I actually give a certain N recommendations to an individual user?" Although surprise is a great library, it does not have this recommendation functionality built into it, but in the next lab, you will get some experience not only fitting recommendation system models, but also programmatically retrieving recommended items for each user.
+You might be wondering, "OK I'm making predictions about certain items rated by certain users, but how can I actually give certain N recommendations to an individual user?" Although `surprise`  is a great library, it does not have this recommendation functionality built into it, but in the next lab, you will get some experience not only fitting recommendation system models, but also programmatically retrieving recommended items for each user.
 
 ### Sources
 
@@ -302,10 +299,9 @@ Jester dataset originally obtained from:
 
 ### Additional Resources
 
-[Surprise Documentation](https://surprise.readthedocs.io/en/stable/index.html)
-
-[Surprise Tutorial](https://blog.cambridgespark.com/tutorial-practical-introduction-to-recommender-systems-dbe22848392b)
+- [Surprise Documentation](https://surprise.readthedocs.io/en/stable/index.html) 
+- [Surprise Tutorial](https://blog.cambridgespark.com/tutorial-practical-introduction-to-recommender-systems-dbe22848392b)
 
 ## Summary
 
-You now should have an understanding of the basic considerations one should take note of when coding a recommendation system as well as how to implement them in different ways using Surprise. In the upcoming lab, you will be tasked with fitting models using surprise and then retrieving those predicted values in a meaningful way to give recommendations to people. Let's see how well it works in action.
+You now should have an understanding of the basic considerations one should take note of when coding a recommendation system as well as how to implement them in different ways using `surprise`. In the upcoming lab, you will be tasked with fitting models using `surprise` and then retrieving those predicted values in a meaningful way to give recommendations to people. Let's see how well it works in action.
