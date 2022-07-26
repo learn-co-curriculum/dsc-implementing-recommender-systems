@@ -1,5 +1,5 @@
+# Implementing Recommendation Engines with Surprise
 
-# Implementing Recommendation Engines with `surprise`
 ## Introduction
 
 This lesson will give you a brief introduction to implementing recommendation engines with a Python library called `surprise`. You'll get a chance to try out multiple different types of collaborative filtering engines, ranging from both basic neighborhood-based methods to matrix factorization methods. 
@@ -159,7 +159,7 @@ print(accuracy.rmse(predictions))
     4.505684958221031
 
 
-Not a particularly amazing model.... As you can see, the model had an RMSE of about 4.5, meaning that it was off by roughly 4 points for each guess it made for ratings. Not horrendous when you consider we're working on a range of 20 points, but let's see if we can improve it. To begin with, let's try with a different similarity metric (pearson correlation) and evaluate our RMSE.
+Not a particularly amazing model.... As you can see, the model had an RMSE of about 4.5, meaning that it was off by roughly 4 points for each guess it made for ratings. Not horrendous when you consider we're working on a range of 20 points, but let's see if we can improve it. To begin with, let's try with a different similarity metric (Pearson correlation) and evaluate our RMSE.
 
 
 ```python
@@ -176,7 +176,7 @@ print(accuracy.rmse(predictions))
     4.273050862297592
 
 
-Pearson correlation seems to have performed better than cosine similarity in the basic KNN model, we can go ahead and use pearson correlation as our similarity metric of choice for future models. The next model we're going to try is [KNN with Means](https://surprise.readthedocs.io/en/stable/knn_inspired.html#surprise.prediction_algorithms.knns.KNNWithMeans). This is the same thing as the basic KNN model, except it takes into account the mean rating of each user or item depending on whether you are performing user-user or item-item similarities, respectively.
+Pearson correlation seems to have performed better than cosine similarity in the basic KNN model, we can go ahead and use Pearson correlation as our similarity metric of choice for future models. The next model we're going to try is [KNN with Means](https://surprise.readthedocs.io/en/stable/knn_inspired.html#surprise.prediction_algorithms.knns.KNNWithMeans). This is the same thing as the basic KNN model, except it takes into account the mean rating of each user or item depending on whether you are performing user-user or item-item similarities, respectively.
 
 
 ```python
