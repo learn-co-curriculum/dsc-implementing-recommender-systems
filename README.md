@@ -19,8 +19,14 @@ First, you'll have to load the jokes dataset. You might have to download it firs
 ```python
 from surprise import Dataset
 from surprise.model_selection import train_test_split
-jokes = Dataset.load_builtin(name='jester')
+
+jokes = Dataset.load_builtin(name="jester")
 ```
+
+    Dataset jester could not be found. Do you want to download it? [Y/n] Y
+    Trying to download dataset from http://eigentaste.berkeley.edu/dataset/archive/jester_dataset_2.zip...
+    Done! Dataset jester has been saved to /Users/pisel/.surprise_data/jester
+
 
 
 ```python
@@ -44,8 +50,8 @@ Notice how there is no `X_train` or `y_train` in our values here. Our only featu
 
 
 ```python
-print('Type trainset :',type(trainset),'\n')
-print('Type testset :',type(testset))
+print("Type trainset :", type(trainset), "\n")
+print("Type testset :", type(testset))
 ```
 
     Type trainset : <class 'surprise.trainset.Trainset'> 
@@ -62,7 +68,7 @@ print(testset[0])
 ```
 
     352288
-    ('54373', '60', 11.062)
+    ('17045', '99', 9.469)
 
 
 ## Memory-Based Methods (Neighborhood-Based)
@@ -80,12 +86,11 @@ One of our first decisions is item-item similarity versus user-user similarity. 
 
 
 ```python
-print('Number of users: ', trainset.n_users, '\n')
-print('Number of items: ', trainset.n_items, '\n')
-
+print("Number of users: ", trainset.n_users, "\n")
+print("Number of items: ", trainset.n_items, "\n")
 ```
 
-    Number of users:  58766 
+    Number of users:  58788 
     
     Number of items:  140 
     
@@ -95,7 +100,7 @@ There are clearly way more users than items! We'll take that into account when i
 
 
 ```python
-sim_cos = {'name':'cosine', 'user_based':False}
+sim_cos = {"name": "cosine", "user_based": False}
 ```
 
 Now it's time to train our model. Note that if you decide to train this model with `user_based=True`, it will take quite some time!
@@ -113,7 +118,7 @@ basic.fit(trainset)
 
 
 
-    <surprise.prediction_algorithms.knns.KNNBasic at 0x11caae940>
+    <surprise.prediction_algorithms.knns.KNNBasic at 0x7f8ab13ac430>
 
 
 
@@ -127,18 +132,18 @@ basic.sim
 
 
 
-    array([[1.        , 0.91999815, 0.84803545, ..., 0.91323232, 0.91887346,
-            0.92105998],
-           [0.91999815, 1.        , 0.84653856, ..., 0.91321288, 0.89122102,
-            0.9377387 ],
-           [0.84803545, 0.84653856, 1.        , ..., 0.84192319, 0.84191848,
-            0.85370128],
+    array([[1.        , 0.51943305, 0.45038497, ..., 0.43113169, 0.63293195,
+            0.50358298],
+           [0.51943305, 1.        , 0.47072746, ..., 0.39462438, 0.52564179,
+            0.23697706],
+           [0.45038497, 0.47072746, 1.        , ..., 0.45181082, 0.44685954,
+            0.26123555],
            ...,
-           [0.91323232, 0.91321288, 0.84192319, ..., 1.        , 0.93339552,
-            0.91814107],
-           [0.91887346, 0.89122102, 0.84191848, ..., 0.93339552, 1.        ,
-            0.92379876],
-           [0.92105998, 0.9377387 , 0.85370128, ..., 0.91814107, 0.92379876,
+           [0.43113169, 0.39462438, 0.45181082, ..., 1.        , 0.58689591,
+            0.20672047],
+           [0.63293195, 0.52564179, 0.44685954, ..., 0.58689591, 1.        ,
+            0.38408102],
+           [0.50358298, 0.23697706, 0.26123555, ..., 0.20672047, 0.38408102,
             1.        ]])
 
 
@@ -155,15 +160,15 @@ predictions = basic.test(testset)
 print(accuracy.rmse(predictions))
 ```
 
-    RMSE: 4.5057
-    4.505684958221031
+    RMSE: 4.2179
+    4.21790884737677
 
 
 Not a particularly amazing model.... As you can see, the model had an RMSE of about 4.5, meaning that it was off by roughly 4 points for each guess it made for ratings. Not horrendous when you consider we're working on a range of 20 points, but let's see if we can improve it. To begin with, let's try with a different similarity metric (Pearson correlation) and evaluate our RMSE.
 
 
 ```python
-sim_pearson = {'name':'pearson', 'user_based':False}
+sim_pearson = {"name": "pearson", "user_based": False}
 basic_pearson = knns.KNNBasic(sim_options=sim_pearson)
 basic_pearson.fit(trainset)
 predictions = basic_pearson.test(testset)
@@ -172,15 +177,15 @@ print(accuracy.rmse(predictions))
 
     Computing the pearson similarity matrix...
     Done computing similarity matrix.
-    RMSE: 4.2731
-    4.273050862297592
+    RMSE: 4.2770
+    4.277027209530047
 
 
 Pearson correlation seems to have performed better than cosine similarity in the basic KNN model, we can go ahead and use Pearson correlation as our similarity metric of choice for future models. The next model we're going to try is [KNN with Means](https://surprise.readthedocs.io/en/stable/knn_inspired.html#surprise.prediction_algorithms.knns.KNNWithMeans). This is the same thing as the basic KNN model, except it takes into account the mean rating of each user or item depending on whether you are performing user-user or item-item similarities, respectively.
 
 
 ```python
-sim_pearson = {'name':'pearson', 'user_based':False}
+sim_pearson = {"name": "pearson", "user_based": False}
 knn_means = knns.KNNWithMeans(sim_options=sim_pearson)
 knn_means.fit(trainset)
 predictions = knn_means.test(testset)
@@ -189,8 +194,8 @@ print(accuracy.rmse(predictions))
 
     Computing the pearson similarity matrix...
     Done computing similarity matrix.
-    RMSE: 4.1360
-    4.135960456406754
+    RMSE: 4.1376
+    4.137639152858765
 
 
 A little better... let's try one more neighborhood-based method before moving into model-based methods. Let's try the [KNNBaseline](https://surprise.readthedocs.io/en/stable/knn_inspired.html#surprise.prediction_algorithms.knns.KNNBaseline) method. This is a more advanced method because it adds in a bias term that is calculated by way of minimizing a cost function represented by:
@@ -201,7 +206,7 @@ With $b_i$ and $b_u$ being biases for items and users respectively and $\mu$ ref
 
 
 ```python
-sim_pearson = {'name':'pearson', 'user_based':False}
+sim_pearson = {"name": "pearson", "user_based": False}
 knn_baseline = knns.KNNBaseline(sim_options=sim_pearson)
 knn_baseline.fit(trainset)
 predictions = knn_baseline.test(testset)
@@ -211,8 +216,8 @@ print(accuracy.rmse(predictions))
     Estimating biases using als...
     Computing the pearson similarity matrix...
     Done computing similarity matrix.
-    RMSE: 4.1313
-    4.131267007009025
+    RMSE: 4.1335
+    4.133519617102723
 
 
 Even better! Now let's see if we can get some insight by applying some matrix factorization techniques!
@@ -249,8 +254,8 @@ predictions = svd.test(testset)
 print(accuracy.rmse(predictions))
 ```
 
-    RMSE: 4.2769
-    4.276870537136861
+    RMSE: 4.2780
+    4.277962167968821
 
 
 Interestingly, this model performed worse than the others! In general, the advantages of matrix factorization starts to show itself when the size of the dataset becomes massive. At that point, the storage challenges increase for the memory-based models, and there is enough data for latent factors to become extremely apparent.
@@ -261,14 +266,14 @@ Now that we've explored some models, we can think about how we might fit the mod
 
 
 ```python
-user_34_prediction = svd.predict('34', '25')
+user_34_prediction = svd.predict("34", "25")
 user_34_prediction
 ```
 
 
 
 
-    Prediction(uid='34', iid='25', r_ui=None, est=2.3921231079679384, details={'was_impossible': False})
+    Prediction(uid='34', iid='25', r_ui=None, est=1.3194139855661309, details={'was_impossible': False})
 
 
 
@@ -282,7 +287,7 @@ user_34_prediction[3]
 
 
 
-    2.3921231079679384
+    1.3194139855661309
 
 
 
