@@ -23,22 +23,10 @@ from surprise.model_selection import train_test_split
 jokes = Dataset.load_builtin(name="jester")
 ```
 
-    Dataset jester could not be found. Do you want to download it? [Y/n] Y
-    Trying to download dataset from http://eigentaste.berkeley.edu/dataset/archive/jester_dataset_2.zip...
-    Done! Dataset jester has been saved to /Users/pisel/.surprise_data/jester
-
-
 
 ```python
 type(jokes)
 ```
-
-
-
-
-    surprise.dataset.DatasetAutoFolds
-
-
 
 
 ```python
@@ -54,11 +42,6 @@ print("Type trainset :", type(trainset), "\n")
 print("Type testset :", type(testset))
 ```
 
-    Type trainset : <class 'surprise.trainset.Trainset'> 
-    
-    Type testset : <class 'list'>
-
-
 Interestingly enough, the values here are of different data types! The `trainset` is still a `surprise` specific data type that is optimized for computational efficiency and the `testset` is a standard Python list - you'll see why when we start making predictions. Let's take a look at how large our `testset` is as well as what's contained in an individual element. A sacrifice of `surprise`'s implementation is that we lose a lot of the exploratory methods that are present with Pandas.
 
 
@@ -66,10 +49,6 @@ Interestingly enough, the values here are of different data types! The `trainset
 print(len(testset))
 print(testset[0])
 ```
-
-    352288
-    ('17045', '99', 9.469)
-
 
 ## Memory-Based Methods (Neighborhood-Based)
 
@@ -90,12 +69,6 @@ print("Number of users: ", trainset.n_users, "\n")
 print("Number of items: ", trainset.n_items, "\n")
 ```
 
-    Number of users:  58788 
-    
-    Number of items:  140 
-    
-
-
 There are clearly way more users than items! We'll take that into account when inputting the specifications to our similarity metrics. Because we have fewer items than users, it will be more efficient to calculate item-item similarity rather than user-user similarity.
 
 
@@ -111,42 +84,12 @@ basic = knns.KNNBasic(sim_options=sim_cos)
 basic.fit(trainset)
 ```
 
-    Computing the cosine similarity matrix...
-    Done computing similarity matrix.
-
-
-
-
-
-    <surprise.prediction_algorithms.knns.KNNBasic at 0x7f8ab13ac430>
-
-
-
 And now our model is fit! Let's take a look at the similarity metrics of each of the items to one another by using the `sim` attribute of our fitted model.
 
 
 ```python
 basic.sim
 ```
-
-
-
-
-    array([[1.        , 0.51943305, 0.45038497, ..., 0.43113169, 0.63293195,
-            0.50358298],
-           [0.51943305, 1.        , 0.47072746, ..., 0.39462438, 0.52564179,
-            0.23697706],
-           [0.45038497, 0.47072746, 1.        , ..., 0.45181082, 0.44685954,
-            0.26123555],
-           ...,
-           [0.43113169, 0.39462438, 0.45181082, ..., 1.        , 0.58689591,
-            0.20672047],
-           [0.63293195, 0.52564179, 0.44685954, ..., 0.58689591, 1.        ,
-            0.38408102],
-           [0.50358298, 0.23697706, 0.26123555, ..., 0.20672047, 0.38408102,
-            1.        ]])
-
-
 
 Now it's time to test the model to determine how well it performed.
 
@@ -160,10 +103,6 @@ predictions = basic.test(testset)
 print(accuracy.rmse(predictions))
 ```
 
-    RMSE: 4.2179
-    4.21790884737677
-
-
 Not a particularly amazing model.... As you can see, the model had an RMSE of about 4.5, meaning that it was off by roughly 4 points for each guess it made for ratings. Not horrendous when you consider we're working on a range of 20 points, but let's see if we can improve it. To begin with, let's try with a different similarity metric (Pearson correlation) and evaluate our RMSE.
 
 
@@ -175,12 +114,6 @@ predictions = basic_pearson.test(testset)
 print(accuracy.rmse(predictions))
 ```
 
-    Computing the pearson similarity matrix...
-    Done computing similarity matrix.
-    RMSE: 4.2770
-    4.277027209530047
-
-
 Pearson correlation seems to have performed better than cosine similarity in the basic KNN model, we can go ahead and use Pearson correlation as our similarity metric of choice for future models. The next model we're going to try is [KNN with Means](https://surprise.readthedocs.io/en/stable/knn_inspired.html#surprise.prediction_algorithms.knns.KNNWithMeans). This is the same thing as the basic KNN model, except it takes into account the mean rating of each user or item depending on whether you are performing user-user or item-item similarities, respectively.
 
 
@@ -191,12 +124,6 @@ knn_means.fit(trainset)
 predictions = knn_means.test(testset)
 print(accuracy.rmse(predictions))
 ```
-
-    Computing the pearson similarity matrix...
-    Done computing similarity matrix.
-    RMSE: 4.1376
-    4.137639152858765
-
 
 A little better... let's try one more neighborhood-based method before moving into model-based methods. Let's try the [KNNBaseline](https://surprise.readthedocs.io/en/stable/knn_inspired.html#surprise.prediction_algorithms.knns.KNNBaseline) method. This is a more advanced method because it adds in a bias term that is calculated by way of minimizing a cost function represented by:
 
@@ -212,13 +139,6 @@ knn_baseline.fit(trainset)
 predictions = knn_baseline.test(testset)
 print(accuracy.rmse(predictions))
 ```
-
-    Estimating biases using als...
-    Computing the pearson similarity matrix...
-    Done computing similarity matrix.
-    RMSE: 4.1335
-    4.133519617102723
-
 
 Even better! Now let's see if we can get some insight by applying some matrix factorization techniques!
 
@@ -254,10 +174,6 @@ predictions = svd.test(testset)
 print(accuracy.rmse(predictions))
 ```
 
-    RMSE: 4.2780
-    4.277962167968821
-
-
 Interestingly, this model performed worse than the others! In general, the advantages of matrix factorization starts to show itself when the size of the dataset becomes massive. At that point, the storage challenges increase for the memory-based models, and there is enough data for latent factors to become extremely apparent.
 
 ## Making Predictions
@@ -270,26 +186,12 @@ user_34_prediction = svd.predict("34", "25")
 user_34_prediction
 ```
 
-
-
-
-    Prediction(uid='34', iid='25', r_ui=None, est=1.3194139855661309, details={'was_impossible': False})
-
-
-
 The output of the prediction is a tuple. Here, we're going to access the estimated rating.
 
 
 ```python
 user_34_prediction[3]
 ```
-
-
-
-
-    1.3194139855661309
-
-
 
 You might be wondering, "OK I'm making predictions about certain items rated by certain users, but how can I actually give certain N recommendations to an individual user?" Although `surprise`  is a great library, it does not have this recommendation functionality built into it, but in the next lab, you will get some experience not only fitting recommendation system models, but also programmatically retrieving recommended items for each user.
 
